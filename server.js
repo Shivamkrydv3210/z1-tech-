@@ -112,7 +112,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     }
     res.status(200).send(`
       <h2>Success!</h2>
-      <p>Your image was resized and posted to  <a href="/">https://x.com/Waltersingh999</a> (check logs for details).</p>
+      <p>Your image was resized and posted to  <a href="https://x.com/Waltersingh999">https://x.com/Waltersingh999</a> (check logs for details).</p>
       <a href="/">Go Back</a>
     `);
   } catch (error) {

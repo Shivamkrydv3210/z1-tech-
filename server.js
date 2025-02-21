@@ -1,11 +1,5 @@
-/**
- * server.js
- * A minimal Node.js application to upload, resize images into four sizes,
- * and post them to a user's X/Twitter account.
- */
 
-require('dotenv').config(); // <---- Load environment variables from .env
-
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const sharp = require('sharp');
@@ -13,7 +7,6 @@ const path = require('path');
 const fs = require('fs');
 const TwitterLite = require('twitter-lite');
 
-// -------------------- Twitter Client Setup (from .env) --------------------
 const twitterClient = new TwitterLite({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
   consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -21,19 +14,16 @@ const twitterClient = new TwitterLite({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 });
 
-// -------------------- Express App Setup --------------------
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Multer setup: store uploaded files in memory (so we can use them directly with sharp)
 const upload = multer({
   storage: multer.memoryStorage(),
 });
 
 const allowedFormats = ['image/jpeg', 'image/png', 'image/gif'];
 
-// Four predefined sizes (customize as needed)
 const PREDEFINED_SIZES = [
   { width: 300, height: 250 },
   { width: 728, height: 90 },
@@ -41,7 +31,6 @@ const PREDEFINED_SIZES = [
   { width: 300, height: 600 },
 ];
 
-// -------------------- HTML for Upload Form --------------------
 const HTML_FORM = `
 <!DOCTYPE html>
 <html lang="en">
@@ -68,29 +57,23 @@ const HTML_FORM = `
 </html>
 `;
 
-// -------------------- Routes --------------------
 
-// GET / : Serve the minimal HTML form
 app.get('/', (req, res) => {
   res.send(HTML_FORM);
 });
 
-// POST /upload : Handle image upload and resizing
 app.post('/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).send('No file uploaded.');
     }
 
-    // Check if the file is an allowed format
     if (!allowedFormats.includes(req.file.mimetype)) {
       return res.status(400).send('Unsupported file format.');
     }
 
-    // The file buffer
     const originalBuffer = req.file.buffer;
 
-    // Resize the image for each predefined dimension
     const resizedBuffers = [];
     for (const size of PREDEFINED_SIZES) {
       const resizedImageBuffer = await sharp(originalBuffer)
@@ -99,8 +82,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       resizedBuffers.push({ buffer: resizedImageBuffer, width: size.width, height: size.height });
     }
 
-    // -------------------- Publish images to X (Twitter) --------------------
-    // For each resized image, we must upload the media, then attach it to a tweet.
     const mediaIds = [];
 
     for (const item of resizedBuffers) {
@@ -117,9 +98,8 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       }
     }
 
-    // Once all images are uploaded, we can post them to the user's timeline.
     if (mediaIds.length > 0) {
-      // Post tweet with attached media
+     
       try {
         await twitterClient.post('statuses/update', {
           status: 'Automatically resized images!',
@@ -130,8 +110,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         console.error('Error posting images:', error);
       }
     }
-
-    // -------------------- Response to the Client --------------------
     res.status(200).send(`
       <h2>Success!</h2>
       <p>Your image was resized and posted to your X/Twitter account (check logs for details).</p>

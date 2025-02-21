@@ -10,9 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2",
-    "multer": "^1.4.5-lts.1",
-    "sharp": "^0.33.5",
-    "twitter-lite": "^1.1.0"
+      "dotenv": "^16.0.3",
+  "express": "^4.17.1",
+  "multer": "^1.4.2",
+  "sharp": "^0.32.1",
+  "twitter-lite": "^1.1.0"
   }
 }

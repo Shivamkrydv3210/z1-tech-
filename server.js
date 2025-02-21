@@ -114,6 +114,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       <h2>Success!</h2>
       <p>Your image was resized and posted to  <a href="https://x.com/Waltersingh999">https://x.com/Waltersingh999</a> .</p>
       <a href="https://github.com/Shivamkrydv3210/z1-tech-">Github link</a>
+      </br>
       <a href="/">Go Back</a>
     `);
   } catch (error) {
